@@ -175,7 +175,7 @@ ggmap(tc_mac_map)+
 The example I showed in the tutorial did not account for population of each state in the map. In the code below, a new variable is created, `starbucks_per_10000`, that gives the number of Starbucks per 10,000 people. It is in the `starbucks_with_2018_pop_est` dataset.
 
 ```{r}
-census_pop_est_2018 <- read_csv("https://www.dropbox.com/s/6txwv3b4ng7pepe/us_census_2018_state_pop_est.csv?dl=1") %>% 
+census_pop_est_2018 <- read_csv("https://www.dropbox.com/s/6txwv3b4ng7pepe/us_census_2018_state_pop_est.csv?dl=1") %>%
   separate(state, into = c("dot","state"), extra = "merge") %>% 
   select(-dot) %>% 
   mutate(state = str_to_lower(state))
@@ -189,7 +189,21 @@ starbucks_with_2018_pop_est <-
 
   6. **`dplyr` review**: Look through the code above and describe what each line of code does.
 
+The first line of code reads in a data set from a dropbox web address. The data set contains the estimated population for each state in the map. It also assigns the data set to the name 'census_pop_est_2018'.
+The data set is then separated by state name and the information in the state category gets put into two different variables, 'dot' and 'state' which holds the split information from the previous state variable.
+Then the variable dot is dropped using the select because there is a negative in front of the dot.
+The names of the strings being held by the state variable were all changed to lowercase. This was to make the joining of the other data set later, easier and more efficient. 
+
+After the 'census_pop_est_2018' was wrangled to completion, a new data set, the 'starbucks_with_2018_pop_est' was created from the 'starbucks_us_by_state' which was wrangled further.
+The 'starbucks_us_by_state' data set was left_joined with the 'census_pop_est_2018' data set, the data sets were joined by the variable 'state_name'.
+The 'census_pop_est_2018' data set's state name variable was named 'state' so in the 'by = ...' code, it indicates that the variable name will be 'state_name' but the name of the joining variable in another data table was different.
+The mutate at the end creates the new variable 'starbucks_per_10000' which calculates the number of Starbucks locations in that state according to the state's estimated population.
+
+
   7. Create a choropleth map that shows the number of Starbucks per 10,000 people on a map of the US. Use a new fill color, add points for all Starbucks in the US (except Hawaii and Alaska), add an informative title for the plot, and include a caption that says who created the plot (you!). Make a conclusion about what you observe.
+  
+WHAT MAP DATA DO I USE HERE?
+
 
 ### A few of your favorite things (`leaflet`)
 
@@ -216,7 +230,7 @@ Two data tables are available:
 - `Trips` contains records of individual rentals
 - `Stations` gives the locations of the bike rental stations
 
-Here is the code to read in the data. We do this a little differently than usualy, which is why it is included here rather than at the top of this file. To avoid repeatedly re-reading the files, start the data import chunk with `{r cache = TRUE}` rather than the usual `{r}`. This code reads in the large dataset right away.
+Here is the code to read in the data. We do this a little differently than usual, which is why it is included here rather than at the top of this file. To avoid repeatedly re-reading the files, start the data import chunk with `{r cache = TRUE}` rather than the usual `{r}`. This code reads in the large dataset right away.
 
 ```{r cache=TRUE}
 data_site <- 
