@@ -208,14 +208,45 @@ WHAT MAP DATA DO I USE HERE?
 ### A few of your favorite things (`leaflet`)
 
   8. In this exercise, you are going to create a single map of some of your favorite places! The end result will be one map that satisfies the criteria below. 
-
-  * Create a data set using the `tibble()` function that has 10-15 rows of your favorite places. The columns will be the name of the location, the latitude, the longitude, and a column that indicates if it is in your top 3 favorite locations or not. For an example of how to use `tibble()`, look at the `favorite_stp_by_lisa` I created in the data R code chunk at the beginning.  
-
-  * Create a `leaflet` map that uses circles to indicate your favorite places. Label them with the name of the place. Choose the base map you like best. Color your 3 favorite places differently than the ones that are not in your top 3 (HINT: `colorFactor()`). Add a legend that explains what the colors mean.  
   
-  * Connect all your locations together with a line in a meaningful way (you may need to order them differently in the original data).  
-  
-  * If there are other variables you want to add that could enhance your plot, do that now.  
+```{r}
+audrey_fav_places <-tibble(
+  place = c("Art Museum", "Illinois Home", "Hot Shop Glass",
+            "Chocolate Factory", "Wisconsin Home", "DC Beach", 
+            "Qdoba", "University Lake School", "Breski's",
+            "Macalester College"),
+  long = c(-87.629798, -87.840625, -87.782852, 
+           -88.231481, -88.216903, -87.377049, 
+           -88.403708, -88.34204, -88.499266,
+           -93.1712321),
+  lat = c(41.878114, 42.258634, 42.726131,
+          43.011678, 43.054206, 44.83413, 
+          43.060842, 43.105008, 43.111673,
+          44.9378965),
+  top3 = c(FALSE, FALSE, FALSE,
+           FALSE, TRUE, FALSE,
+           FALSE, TRUE, FALSE,
+           TRUE)
+  )
+
+pal <- colorFactor(palette = "viridis", 
+                    domain = audrey_fav_places$top3)
+
+leaflet(data = audrey_fav_places) %>% 
+  addTiles() %>% 
+  addCircles(lng = ~long,
+             lat = ~lat, 
+             label = ~place,
+             opacity = 1,
+             weight = 10,
+             color = ~pal(top3)) %>% 
+  addLegend(position = "bottomleft",
+            pal = pal,
+            values = ~top3) %>% 
+  addPolylines(lng = ~long,
+               lat = ~lat,
+               color = col2hex("maroon"))
+```
   
 ## Revisiting old datasets
 
