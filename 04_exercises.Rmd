@@ -62,19 +62,6 @@ covid19 <- read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/mas
 
 If you were not able to get set up on GitHub last week, go [here](https://github.com/llendway/github_for_collaboration/blob/master/github_for_collaboration.md) and get set up first. Then, do the following (if you get stuck on a step, don't worry, I will help! You can always get started on the homework and we can figure out the GitHub piece later):
 
-* Create a repository on GitHub, giving it a nice name so you know it is for the 4th weekly exercise assignment (follow the instructions in the document/video).  
-* Copy the repo name so you can clone it to your computer. In R Studio, go to file --> New project --> Version control --> Git and follow the instructions from the document/video.  
-* Download the code from this document and save it in the repository folder/project on your computer.  
-* In R Studio, you should then see the .Rmd file in the upper right corner in the Git tab (along with the .Rproj file and probably .gitignore).  
-* Check all the boxes of the files in the Git tab under Stage and choose commit.  
-* In the commit window, write a commit message, something like "Initial upload" would be appropriate, and commit the files.  
-* Either click the green up arrow in the commit window or close the commit window and click the green up arrow in the Git tab to push your changes to GitHub.  
-* Refresh your GitHub page (online) and make sure the new documents have been pushed out.  
-* Back in R Studio, knit the .Rmd file. When you do that, you should have two (as long as you didn't make any changes to the .Rmd file, in which case you might have three) files show up in the Git tab - an .html file and an .md file. The .md file is something we haven't seen before and is here because I included `keep_md: TRUE` in the YAML heading. The .md file is a markdown (NOT R Markdown) file that is an interim step to creating the html file. They are displayed fairly nicely in GitHub, so we want to keep it and look at it there. Click the boxes next to these two files, commit changes (remember to include a commit message), and push them (green up arrow).  
-* As you work through your homework, save and commit often, push changes occasionally (maybe after you feel finished with an exercise?), and go check to see what the .md file looks like on GitHub.  
-* If you have issues, let me know! This is new to many of you and may not be intuitive at first. But, I promise, you'll get the hang of it! 
-
-
 ## Instructions
 
 * Put your name at the top of the document. 
@@ -86,7 +73,6 @@ If you were not able to get set up on GitHub last week, go [here](https://github
 * Use good coding practice. Read the short sections on good code with [pipes](https://style.tidyverse.org/pipes.html) and [ggplot2](https://style.tidyverse.org/ggplot2.html). **This is part of your grade!**
 
 * When you are finished with ALL the exercises, uncomment the options at the top so your document looks nicer. Don't do it before then, or else you might miss some important warnings and messages.
-
 
 ## Warm-up exercises from tutorial
 
@@ -272,14 +258,51 @@ Stations<-read_csv("http://www.macalester.edu/~dshuman1/data/112/DC-Stations.csv
 
   9. Use the latitude and longitude variables in `Stations` to make a visualization of the total number of departures from each station in the `Trips` data. Use either color or size to show the variation in number of departures. This time, plot the points on top of a map. Use any of the mapping tools you'd like.
   
-```{r}
+SCALE LEGEND
 
+```{r}
+Small_Trips <- Trips %>% 
+  group_by(`sstation`) %>% 
+  summarise(num_departures = n()) %>% 
+  ungroup()
+
+New_Small_Trips <- Small_Trips %>% 
+  left_join(Stations,
+            by = c("sstation" = "name")) %>% 
+  select(`sstation`, `lat`, `long`, `num_departures`)
+
+pal <- colorFactor(palette = "viridis", 
+                    domain = New_Small_Trips$num_departures)
+
+leaflet(data = New_Small_Trips) %>% 
+  addTiles() %>% 
+  addCircles(lng = ~long,
+             lat = ~lat,
+             opacity = 1,
+             weight = 10,
+             color = ~pal(num_departures)) %>% 
+  addLegend(position = "topright",
+            pal = pal,
+            values = ~num_departures)
 ```
   
   10. Only 14.4% of the trips in our data are carried out by casual users. Create a plot that shows which area(s) have stations with a much higher percentage of departures by casual users. What patterns do you notice? Also plot this on top of a map. I think it will be more clear what the patterns are.
   
 ```{r}
 
+# pal <- colorFactor(palette = "viridis", 
+#                     domain = New_Small_Trips$num_departures)
+# 
+# leaflet(data = New_Small_Trips) %>% 
+#   addTiles() %>% 
+#   addCircles(lng = ~long,
+#              lat = ~lat,
+#              opacity = 1,
+#              weight = 10,
+#              color = ~pal(num_departures)) %>% 
+#   addLegend(position = "topright",
+#             pal = pal,
+#             values = ~num_departures)
 ```
   
 ### COVID-19 data
@@ -335,7 +358,7 @@ MplsStops %>%
                    stroke = FALSE,
                    color = ~pal(problem),
                    radius = 2) %>% 
-  addLegend(position = "topleft",
+  addLegend(position = "bottomright",
             pal = pal,
             values = ~problem)
 ```
