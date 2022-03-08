@@ -258,8 +258,6 @@ Stations<-read_csv("http://www.macalester.edu/~dshuman1/data/112/DC-Stations.csv
 
   9. Use the latitude and longitude variables in `Stations` to make a visualization of the total number of departures from each station in the `Trips` data. Use either color or size to show the variation in number of departures. This time, plot the points on top of a map. Use any of the mapping tools you'd like.
   
-SCALE LEGEND
-
 ```{r}
 Small_Trips <- Trips %>% 
   group_by(`sstation`) %>% 
@@ -336,9 +334,9 @@ mpls_suspicious <- MplsStops %>%
   filter(`problem` == "suspicious") %>% 
   group_by(`problem`, `neighborhood`) %>% 
   mutate(num_sus = n(),
-         proportion_sus = (num_sus/num)*100) %>% 
+         prop_suspicious = (num_sus/num)*100) %>% 
   ungroup() %>% 
-  summarise(`neighborhood`, `proportion_sus`, `num`) %>% 
+  summarise(`neighborhood`, `prop_suspicious`, `num`) %>% 
   arrange(desc(`num`)) %>% 
   distinct()
 ```
@@ -364,19 +362,36 @@ MplsStops %>%
   
   16. Save the folder from moodle called Minneapolis_Neighborhoods into your project/repository folder for this assignment. Make sure the folder is called Minneapolis_Neighborhoods. Use the code below to read in the data and make sure to **delete the `eval=FALSE`**. Although it looks like it only links to the .sph file, you need the entire folder of files to create the `mpls_nbhd` data set. These data contain information about the geometries of the Minneapolis neighborhoods. Using the `mpls_nbhd` dataset as the base file, join the `mpls_suspicious` and `MplsDemo` datasets to it by neighborhood (careful, they are named different things in the different files). Call this new dataset `mpls_all`.
   
-  NEED TO JOIN ONCE MPLS_SUS IS MADE
-
 ```{r}
 mpls_nbhd <- st_read("Minneapolis_Neighborhoods/Minneapolis_Neighborhoods.shp", quiet = TRUE)
 
-mpls_nbhd %>% 
+mpls_all <- mpls_nbhd %>% 
   left_join(MplsDemo, 
+            by = c("BDNAME" = "neighborhood")) %>% 
+  left_join(mpls_suspicious,
             by = c("BDNAME" = "neighborhood"))
-  # left_join(mpls_suspicious,
-  #           by = c("BDNAME" = "neighborhood"))
 ```
 
   17. Use `leaflet` to create a map from the `mpls_all` data  that colors the neighborhoods by `prop_suspicious`. Display the neighborhood name as you scroll over it. Describe what you observe in the map.
+  
+There is the value `NA` in the legend and South Uptown is the only neighborhood that is filled with the `NA` color. There are also sections of neighborhoods that have a higher proportion of suspicious stops than traffic stops, this means that those neighborhoods likely have a more present police force. The lower right quarter of the map shows that there are a higher number of suspicious traffic stops.
+  
+```{r}
+pal <- colorNumeric(palette = "magma", 
+                    domain = mpls_all$prop_suspicious)
+
+mpls_all %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  addPolygons(fillColor = ~pal(prop_suspicious),
+              fillOpacity = 0.8,
+              label = ~BDNAME) %>% 
+  addLegend(pal = pal, 
+            values = ~prop_suspicious, 
+            opacity = 0.8, 
+            title = NULL,
+            position = "bottomleft") 
+```
   
   18. Use `leaflet` to create a map of your own choosing. Come up with a question you want to try to answer and use the map to help answer that question. Describe what your map shows. 
   
