@@ -271,7 +271,7 @@ New_Small_Trips <- Small_Trips %>%
             by = c("sstation" = "name")) %>% 
   select(`sstation`, `lat`, `long`, `num_departures`)
 
-pal <- colorFactor(palette = "viridis", 
+pal <- colorNumeric(palette = "viridis", 
                     domain = New_Small_Trips$num_departures)
 
 leaflet(data = New_Small_Trips) %>% 
@@ -327,10 +327,8 @@ These exercises use the datasets `MplsStops` and `MplsDemo` from the `carData` l
 
   14. Use the `MplsStops` dataset to find out how many stops there were for each neighborhood and the proportion of stops that were for a suspicious vehicle or person. Sort the results from most to least number of stops. Save this as a dataset called `mpls_suspicious` and display the table.  
   
-I ONLY NEED ONE OF EACH NEIGHBORHOOD! and save it to new name
-  
 ```{r}
-MplsStops %>% 
+mpls_suspicious <- MplsStops %>% 
   select(`neighborhood`, `problem`) %>% 
   group_by(`neighborhood`) %>% 
   mutate(num = n()) %>% 
@@ -341,11 +339,12 @@ MplsStops %>%
          proportion_sus = (num_sus/num)*100) %>% 
   ungroup() %>% 
   summarise(`neighborhood`, `proportion_sus`, `num`) %>% 
-  arrange(desc(`num`))
+  arrange(desc(`num`)) %>% 
+  distinct()
 ```
   
-  15. Use a `leaflet` map and the `MplsStops` dataset to display each of the stops on a map as a small point. Color the points differently depending on whether they were for suspicious vehicle/person or a traffic stop (the `problem` variable). HINTS: use `addCircleMarkers`, set `stroke = FAlSE`, use `colorFactor()` to create a palette.  
-
+  15. Use a `leaflet` map and the `MplsStops` dataset to display each of the stops on a map as a small point. Color the points differently depending on whether they were for suspicious vehicle/person or a traffic stop (the `problem` variable). HINTS: use `addCircleMarkers`, set `stroke = FAlSE`, use `colorFactor()` to create a palette.
+  
 ```{r}
 pal <- colorFactor(palette = "viridis", 
                     domain = MplsStops$problem)
