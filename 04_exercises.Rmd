@@ -492,9 +492,25 @@ mpls_all %>%
   
   18. Use `leaflet` to create a map of your own choosing. Come up with a question you want to try to answer and use the map to help answer that question. Describe what your map shows. 
 
+The map shows the Starbucks Locations across Wisconsin and the place markers are colored by and labeled with the city name that the Starbucks is located in. They are most heavily located around Milwaukee and Madison areas with many other locations scattered throughout the lower half of the state. There is no legend for the map, seeing as it would be difficult to scale however the use of color and labels is more effective.
+
 ```{r}
+WI_Starbucks <- Starbucks %>% 
+  filter(`Country` == "US", 
+         `State/Province` == "WI") %>% 
+  select(`Ownership Type`, `Street Address`, `City`, `Longitude`, `Latitude`)
 
+pal <- colorFactor(palette = "plasma", 
+                    domain = WI_Starbucks$City)
 
+WI_Starbucks %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  addCircleMarkers(lng = ~Longitude,
+                   lat = ~Latitude,
+                   color = ~pal(City),
+                   label = ~City,
+                   radius = 3)
 ```
   
   
